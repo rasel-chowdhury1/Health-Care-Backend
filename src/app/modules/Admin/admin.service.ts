@@ -6,18 +6,15 @@ const getAllAdminsFromDB = async (params: any) => {
     const searchValue = params.searchTerm;
     let result;
     if(searchValue){
+        const searchFields = ['name', 'email'];
         result = await prisma.admin.findMany({
             where: {
-                OR: [
-                    { name: {
+                OR: searchFields.map(field => ({
+                    [field]: {
                         contains: params.searchTerm,
                         mode: "insensitive"
-                    }},
-                    { email: {
-                        contains: params.searchTerm,
-                        mode: "insensitive"
-                    }},
-                ]
+                    }
+                }))
             }
         });
     }
