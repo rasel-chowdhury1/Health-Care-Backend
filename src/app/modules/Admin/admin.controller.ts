@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { AdminServices } from "./admin.service";
 import sendResponse from "../../utils/SendResponse";
 import pickFields from "../../../shared/pick";
@@ -21,7 +21,7 @@ const getAllAdmin = async (req: Request, res: Response) => {
     })
 }
 
-const getSpecificAdmin = async( req: Request, res: Response) => {
+const getSpecificAdmin = async( req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     try {
         const result = await AdminServices.getDataByIdFromDB(id);
@@ -43,16 +43,11 @@ const getSpecificAdmin = async( req: Request, res: Response) => {
             })
         }
     } catch (err) {
-        sendResponse(res, {
-            statusCode: 500,
-            success: false,
-            message: err?.name || "something went wrong",
-            error: err
-        })
+        next(err)
     }
 }
 
-const updateSpecificAdmin = async(req: Request, res: Response) => {
+const updateSpecificAdmin = async(req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     const data = req.body;
     console.log({id,data})
@@ -67,16 +62,11 @@ const updateSpecificAdmin = async(req: Request, res: Response) => {
             data: result
         })
     } catch (err) {
-        sendResponse(res, {
-            statusCode: 500,
-            success: false,
-            message: "not found error",
-            data: err?.name || "something went wrong"
-        })
+        next(err)
     }
 }
 
-const deletedSpecificAdmin = async(req: Request, res: Response) => {
+const deletedSpecificAdmin = async(req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     console.log({id})
     try {
@@ -89,16 +79,11 @@ const deletedSpecificAdmin = async(req: Request, res: Response) => {
             data: result
         })
     } catch (err) {
-        sendResponse(res, {
-            statusCode: 500,
-            success: false,
-            message: err.name || "something went wrong",
-            error: err
-        })
+        next(err)
     }
 }
 
-const softDeletedSpecificAdmin = async(req: Request, res: Response) => {
+const softDeletedSpecificAdmin = async(req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     console.log({id})
     try {
@@ -111,12 +96,7 @@ const softDeletedSpecificAdmin = async(req: Request, res: Response) => {
             data: result
         })
     } catch (err) {
-        sendResponse(res, {
-            statusCode: 500,
-            success: false,
-            message: err.name || "something went wrong",
-            error: err
-        })
+       next(err)
     }
 }
 
