@@ -1,7 +1,7 @@
-import { PrismaClient, UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import { prisma } from "../../../helpers/prisma";
 
-const prisma = new PrismaClient()
 
 const allUser = async () => {
     const result = await prisma.user.findMany({
