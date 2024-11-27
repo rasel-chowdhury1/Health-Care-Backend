@@ -3,10 +3,11 @@ import { AdminServices } from "./admin.service";
 import sendResponse from "../../utils/SendResponse";
 import pickFields from "../../../shared/pick";
 import { AdminFilterableFields } from "./admin.constant";
+import { CatchAsync } from "../../utils/CatchAsync";
 
 
 
-const getAllAdmin = async (req: Request, res: Response) => {
+const getAllAdmin = CatchAsync(async (req: Request, res: Response) => {
     // console.log(req.query)
     const filters = pickFields(req.query, AdminFilterableFields);
     const options = pickFields(req.query, ['page','limit','sortBy','sortOrder'])
@@ -19,12 +20,11 @@ const getAllAdmin = async (req: Request, res: Response) => {
         meta: result.meta,
         data: result.data
     })
-}
+})
 
-const getSpecificAdmin = async( req: Request, res: Response, next: NextFunction) => {
+const getSpecificAdmin = CatchAsync(async( req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
-    try {
-        const result = await AdminServices.getDataByIdFromDB(id);
+    const result = await AdminServices.getDataByIdFromDB(id);
         
         if(result){
             sendResponse(res, {
@@ -42,63 +42,47 @@ const getSpecificAdmin = async( req: Request, res: Response, next: NextFunction)
                 data: result
             })
         }
-    } catch (err) {
-        next(err)
-    }
-}
+})
 
-const updateSpecificAdmin = async(req: Request, res: Response, next: NextFunction) => {
+const updateSpecificAdmin = CatchAsync(async(req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     const data = req.body;
     console.log({id,data})
+    const result = await AdminServices.updateSpecificAdminIntoDB(id, data);
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Admin data updated by id",
+        data: result
+    })
+})
 
-    try {
-        const result = await AdminServices.updateSpecificAdminIntoDB(id, data);
-        
-        sendResponse(res, {
-            statusCode: 200,
-            success: true,
-            message: "Admin data updated by id",
-            data: result
-        })
-    } catch (err) {
-        next(err)
-    }
-}
-
-const deletedSpecificAdmin = async(req: Request, res: Response, next: NextFunction) => {
+const deletedSpecificAdmin = CatchAsync(async(req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     console.log({id})
-    try {
-        const result = await AdminServices.deleteAdminIntoDB(id);
-        
-        sendResponse(res, {
-            statusCode: 200,
-            success: true,
-            message: "Admin data deleted.",
-            data: result
-        })
-    } catch (err) {
-        next(err)
-    }
-}
+    const result = await AdminServices.deleteAdminIntoDB(id);
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Admin data deleted.",
+        data: result
+    })
+})
 
-const softDeletedSpecificAdmin = async(req: Request, res: Response, next: NextFunction) => {
+const softDeletedSpecificAdmin = CatchAsync( async(req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     console.log({id})
-    try {
-        const result = await AdminServices.softDeleteAdminIntoDB(id);
-        
-        sendResponse(res, {
-            statusCode: 200,
-            success: true,
-            message: "Admin data deleted.",
-            data: result
-        })
-    } catch (err) {
-       next(err)
-    }
-}
+    const result = await AdminServices.softDeleteAdminIntoDB(id);
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Admin data deleted.",
+        data: result
+    })
+})
 
 
 export const AdminControllers = {
